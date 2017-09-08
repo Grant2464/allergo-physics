@@ -30,7 +30,7 @@ int main() {
     init();
     vector ball;
     vector velocity;
-    ball.x=1;
+    ball.x=600;
     ball.y=0;
     velocity.x=20;
     velocity.y=10;
@@ -54,18 +54,21 @@ int main() {
         al_clear_to_color(al_map_rgb(0,0,0));
         al_clear_to_color(al_map_rgb(0,0,0));
         vector point1;
-        point1.x=100;
-        point1.y=100;
+        point1.x=200;
+        point1.y=200;
         vector point2;
-        point2.x=100;
-        point2.y=300;
+        point2.x=200;
+        point2.y=400;
         vector middle=midpoint(point1,point2);
         point1=rotate(point1,middle,-45);
         point2=rotate(point2,middle,-45);
         line(point1.x,point1.y,point2.x,point2.y);
-        float dist=abs((point2.x-point1.x)*ball.x+(point1.y-point2.y)*ball.y+(point1.x-point2.x)*point1.y+point1.x*(point2.y-point1.y))/(sqrt(pow(point2.x-point1.x,2)+pow(point1.y-point2.y,2)));
+        float dist=abs((point2.y-point1.y)*ball.x-(point2.x-point1.x)*ball.y+point2.x*point1.y-point2.y*point1.x)/sqrt(pow(point2.y-point1.y,2)+pow(point2.x-point1.x,2));
+        printf("%f\n",dist);
         if(dist<=10){
             circle(30,30);
+            velocity.x*=-1;
+            velocity.y*=-1;
             al_flip_display();
         }
 
@@ -73,7 +76,7 @@ int main() {
 
         al_flip_display();
         ball=vector_sum(ball,velocity);
-        delay(1000/10);
+        delay(1000/60);
     }
     al_destroy_display(display);
     return 0;
