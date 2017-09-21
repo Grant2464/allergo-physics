@@ -1,3 +1,4 @@
 # allergo-physics
-SCRAPPED PROJECT (Non functional)
+SCRAPPED PROJECT (Semi functional)
+----------------------------------------
 A simple allegro phyics engine
