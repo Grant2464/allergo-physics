@@ -4,7 +4,8 @@
 #include <allegro5/allegro_ttf.h>
 #include <stdio.h>
 #include <math.h>
-void draw_ball(shape b);
-void draw_rect(shape r);
-void draw_line(shape l);
-void draw();
+
+void physics_ball(shape b);
+void physics_rect(shape r);
+void physics_line(shape l);
+void physics();

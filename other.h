@@ -4,7 +4,5 @@
 #include <allegro5/allegro_ttf.h>
 #include <stdio.h>
 #include <math.h>
-void draw_ball(shape b);
-void draw_rect(shape r);
-void draw_line(shape l);
-void draw();
+int init(int w, int h);
+void delay(int sec);
