@@ -4,8 +4,11 @@
 #include <allegro5/allegro_ttf.h>
 #include <stdio.h>
 #include <math.h>
+#define width 1000
+#define height 1000
 ALLEGRO_DISPLAY *display=0;
 ALLEGRO_FONT *font=0;
+
 typedef struct  _vector {
 		float x;
 		float y;
@@ -45,9 +48,9 @@ typedef struct node {
 		struct node* next;
 } node;
 node* shapes=NULL;
-void add_circle(int pos_x1,int pos_y1,int radius,int r,int g, int b);
-void add_rect(int pos_x1,int pos_y1,int pos_x2,int pos_y2,int r,int g, int b);
-void add_line(int pos_x1,int pos_y1,int pos_x2,int pos_y2,int r,int g, int b);
+void add_circle(int pos_x1,int pos_y1,int vel,int accel,int radius,int r,int g, int b);
+void add_rect(int pos_x1,int pos_y1,int pos_x2,int pos_y2,int vel,int accel,int r,int g, int b);
+void add_line(int pos_x1,int pos_y1,int pos_x2,int pos_y2,int vel,int accel,int r,int g, int b);
 
 int append(shape data,node* head);
 void draw();
@@ -65,9 +68,9 @@ int main() {
 		init();
 
 		for(int x=0; x<600; x+=20) {
-				add_circle(rand()%600,rand()%600,rand()%10+10,rand()%255,rand()%255,rand()%255);
-				add_rect(rand()%600,rand()%600,rand()%600,rand()%600,rand()%255,rand()%255,rand()%255);
-				add_line(rand()%600,rand()%600,rand()%600,rand()%600,rand()%255,rand()%255,rand()%255);
+				add_circle(rand()%width,rand()%height,rand()%10-5,10,rand()%10+10,rand()%255,rand()%255,rand()%255);
+				add_rect(rand()%width,rand()%height,rand()%width,rand()%height,rand()%10-5,10,rand()%255,rand()%255,rand()%255);
+				add_line(rand()%width,rand()%height,rand()%width,rand()%height,rand()%10-5,10,rand()%255,rand()%255,rand()%255);
 
 		}
 		while(1) {
@@ -102,7 +105,7 @@ int init(void) {
 				fprintf(stderr,"Couldn't initialize primitives addon!\n");
 				return -1;
 		}
-		display=al_create_display(600,600);
+		display=al_create_display(width,height);
 		if(!display) {
 				fprintf(stderr,"Couldn't create allegro display!\n");
 				return -1;
@@ -110,11 +113,12 @@ int init(void) {
 
 
 }
-void add_circle(int pos_x1,int pos_y1,int radius,int r,int g, int b){
+void add_circle(int pos_x1,int pos_y1,int vel, int accel,int radius,int r,int g, int b){
 		shape new_shape;
 		ball new_ball;
 		new_ball.pos1.x=pos_x1,new_ball.pos1.y=pos_y1;
-		new_ball.vel.x=10,new_ball.vel.y=10;
+		new_ball.vel.x=vel,new_ball.vel.y=vel;
+		new_ball.accel.x=accel,new_ball.accel.y=accel;
 		new_ball.radius=radius;
 		new_ball.r=r,new_ball.g=g,new_ball.b=b;
 		new_shape.shape_ball=new_ball;
@@ -122,11 +126,12 @@ void add_circle(int pos_x1,int pos_y1,int radius,int r,int g, int b){
 		new_shape.physics=physics_ball;
 		append(new_shape,shapes);
 }
-void add_rect(int pos_x1,int pos_y1,int pos_x2,int pos_y2,int r,int g, int b){
+void add_rect(int pos_x1,int pos_y1,int pos_x2,int pos_y2,int vel, int accel,int r,int g, int b){
 		shape new_shape;
 		rect new_rect;
 		new_rect.pos1.x=pos_x1,new_rect.pos1.y=pos_y1,new_rect.pos2.x=pos_x2,new_rect.pos2.y=pos_y2;
-		new_rect.vel.x=10,new_rect.vel.y=10;
+		new_rect.vel.x=vel,new_rect.vel.y=vel;
+		new_rect.accel.x=accel,new_rect.accel.y=accel;
 		new_rect.r=r,new_rect.g=g,new_rect.b=b;
 		new_shape.shape_rect=new_rect;
 		new_shape.draw=draw_rect;
@@ -134,11 +139,12 @@ void add_rect(int pos_x1,int pos_y1,int pos_x2,int pos_y2,int r,int g, int b){
 
 		append(new_shape,shapes);
 }
-void add_line(int pos_x1,int pos_y1,int pos_x2,int pos_y2,int r,int g, int b){
+void add_line(int pos_x1,int pos_y1,int pos_x2,int pos_y2,int vel, int accel,int r,int g, int b){
 		shape new_shape;
 		line new_line;
 		new_line.pos1.x=pos_x1,new_line.pos1.y=pos_y1,new_line.pos2.x=pos_x2,new_line.pos2.y=pos_y2;
-		new_line.vel.x=10,new_line.vel.y=10;
+		new_line.vel.x=vel,new_line.vel.y=vel;
+		new_line.accel.x=accel,new_line.accel.y=accel;
 		new_line.r=r,new_line.g=g,new_line.b=b;
 		new_shape.shape_line=new_line;
 		new_shape.draw=draw_line;
@@ -164,40 +170,38 @@ void draw_line(shape l)
 }
 void physics_ball(shape b)
 {
-		b.shape_ball.pos1=vector_sum(b.shape_ball.vel,b.shape_ball.pos1);
+		shapes->data.shape_ball.pos1=vector_sum(shapes->data.shape_ball.vel,shapes->data.shape_ball.pos1);
 }
 void physics_rect(shape r)
 {
-		r.shape_rect.pos1=vector_sum(r.shape_rect.vel,r.shape_rect.pos1);
-		r.shape_rect.pos2=vector_sum(r.shape_rect.vel,r.shape_rect.pos2);
+		shapes->data.shape_rect.pos1=vector_sum(shapes->data.shape_rect.vel,shapes->data.shape_rect.pos1);
+		shapes->data.shape_rect.pos2=vector_sum(shapes->data.shape_rect.vel,shapes->data.shape_rect.pos2);
 
 }
 void physics_line(shape l)
 {
-		l.shape_line.pos1=vector_sum(l.shape_line.vel,l.shape_line.pos1);
-		l.shape_line.pos2=vector_sum(l.shape_line.vel,l.shape_line.pos2);
+		shapes->data.shape_line.pos1=vector_sum(shapes->data.shape_line.vel,shapes->data.shape_line.pos1);
+		shapes->data.shape_line.pos2=vector_sum(shapes->data.shape_line.vel,shapes->data.shape_line.pos2);
 }
 void draw(){
 		node* temp=shapes;
-		int count=0;
 		while(temp!=NULL)
 		{
-				if(count==0) {
-						printf("%f\n", temp->data.shape_ball.pos1.x);
-				}
+
 				(*temp->data.draw)(temp->data);
 				temp= temp->next;
-				count=1;
 		}
 
 }
 void physics(){
-		node* temp=shapes;
-		while(temp!=NULL)
+		node* head=shapes;
+		while(shapes!=NULL)
 		{
-				(*temp->data.physics)(temp->data);
-				temp= temp->next;
+				(*shapes->data.physics)(shapes->data);
+				shapes= shapes->next;
 		}
+		shapes=head;
+
 }
 int append(shape data,node* head){
 		if(head==NULL) {
