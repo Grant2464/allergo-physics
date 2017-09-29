@@ -48,6 +48,7 @@ typedef struct node {
 		struct node* next;
 } node;
 node* shapes=NULL;
+
 void add_circle(int pos_x1,int pos_y1,int vel,int accel,int radius,int r,int g, int b);
 void add_rect(int pos_x1,int pos_y1,int pos_x2,int pos_y2,int vel,int accel,int r,int g, int b);
 void add_line(int pos_x1,int pos_y1,int pos_x2,int pos_y2,int vel,int accel,int r,int g, int b);
@@ -62,22 +63,32 @@ void physics_ball(shape b);
 void physics_rect(shape r);
 void physics_line(shape l);
 int init(void);
+void delay(int sec){
+		int ms = 1000 * sec;
+		clock_t start = clock();
+		while (clock() < start + ms) ;
+}
 int main() {
 		time_t t;
-		srand((unsigned) time(&t));
+		srand((unsigned)time(&t));
 		init();
 
-		for(int x=0; x<600; x+=20) {
-				add_circle(rand()%width,rand()%height,rand()%10-5,10,rand()%10+10,rand()%255,rand()%255,rand()%255);
-				add_rect(rand()%width,rand()%height,rand()%width,rand()%height,rand()%10-5,10,rand()%255,rand()%255,rand()%255);
-				add_line(rand()%width,rand()%height,rand()%width,rand()%height,rand()%10-5,10,rand()%255,rand()%255,rand()%255);
 
-		}
+		int count=0;
 		while(1) {
+				if(count%20==0) {
+						for(int x=0; x<100; x+=20) {
+								add_circle(rand()%width,rand()%height,rand()%20-10,10,rand()%10+10,rand()%255,rand()%255,rand()%255);
+								add_rect(rand()%width,rand()%height,rand()%width,rand()%height,rand()%20-10,10,rand()%255,rand()%255,rand()%255);
+								add_line(rand()%width,rand()%height,rand()%width,rand()%height,rand()%20-10,10,rand()%255,rand()%255,rand()%255);
+						}
+				}
 				al_clear_to_color(al_map_rgb(0,0,0));
 				physics();
 				draw();
 				al_flip_display();
+				count++;
+				delay(1000/60);
 		}
 }
 int init(void) {
@@ -85,22 +96,6 @@ int init(void) {
 				fprintf(stderr, "Failed to initialize Allegro.\n");
 				return -1;
 		}
-		/*
-		   if(!al_init_font_addon()) {
-		        fprintf(stderr, "Failed to initialize Font.\n");
-		        return -1;
-		   }
-		   if(!al_init_ttf_addon()) {
-		        fprintf(stderr, "Failed to initialize Ttf.\n");
-		        return -1;
-
-		   }
-		   font=al_load_ttf_font("arial.ttf",72,0 );
-		   if(!font) {
-		        fprintf(stderr,"Couldn't create allegro font!\n");
-		        return -1;
-		   }
-		 */
 		if(!al_init_primitives_addon()) {
 				fprintf(stderr,"Couldn't initialize primitives addon!\n");
 				return -1;
