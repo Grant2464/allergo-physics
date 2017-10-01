@@ -28,7 +28,9 @@ typedef struct _shape {
 		line shape_line;
 		vector vel,accel;
 		void (*draw)(struct _shape);
-		void (*physics)(struct _shape);
+		void (*physics)(char *id);
+		void (*move)(float x, float y);
+		void (*rotate)(char *id,float degrees);
 } shape;
 typedef struct node {
 		shape data;

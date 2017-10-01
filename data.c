@@ -39,6 +39,9 @@ void add_circle(char *id,int pos_x1,int pos_y1,float vel_x,float vel_y,float acc
 		new_shape.shape_ball=new_ball;
 		new_shape.draw=draw_ball;
 		new_shape.physics=physics_ball;
+		new_shape.move=move_ball;
+		new_shape.rotate=rotate_ball;
+
 		append(new_shape,shapes);
 }
 void add_rect(char *id,int pos_x1,int pos_y1,int pos_x2,int pos_y2,float vel_x,float vel_y,float accel_x,float accel_y,int r,int g, int b){
@@ -53,6 +56,8 @@ void add_rect(char *id,int pos_x1,int pos_y1,int pos_x2,int pos_y2,float vel_x,f
 		new_shape.shape_rect=new_rect;
 		new_shape.draw=draw_rect;
 		new_shape.physics=physics_rect;
+		new_shape.move=move_rect;
+		new_shape.rotate=rotate_rect;
 
 		append(new_shape,shapes);
 }
@@ -69,6 +74,8 @@ void add_line(char *id,int pos_x1,int pos_y1,int pos_x2,int pos_y2,float vel_x,f
 		new_shape.shape_line=new_line;
 		new_shape.draw=draw_line;
 		new_shape.physics=physics_line;
+		new_shape.move=move_line;
+		new_shape.rotate=rotate_line;
 
 		append(new_shape,shapes);
 }
