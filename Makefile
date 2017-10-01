@@ -5,6 +5,7 @@ OBJECTS = main.o data.o draw.o physics.o other.o
 engine.out: $(OBJECTS)
 	gcc -Wall -o $@ -g main.o data.o draw.o physics.o other.o -lallegro -lallegro_ttf -lallegro_font -lallegro_primitives -lm
 	make clean
+	./$@
 %.o: %.c
 	gcc -c $< -o $@
 
