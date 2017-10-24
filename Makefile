@@ -1,13 +1,17 @@
+OBJ = al_engine.o
+a.out: main.o al_engine.o
+	gcc -Wall -o a.out main.o al_engine.o -lallegro -lallegro_primitives
 
-HEADERS = data.h draw.h physics.h other.h
-OBJECTS = main.o data.o draw.o physics.o other.o
 
-engine.out: $(OBJECTS)
-	gcc -Wall -o $@ -g main.o data.o draw.o physics.o other.o -lallegro -lallegro_ttf -lallegro_font -lallegro_primitives -lm
-	make clean
-	./$@
-%.o: %.c
-	gcc -c $< -o $@
+debug: main.o al_engine.o
+	gcc -Wall -o a.out main.o al_engine.o -lallegro -lallegro_primitives -g
+
+main.o: main.c
+	gcc -c main.c
+
+al_engine.o: al_engine.c al_engine.h
+	gcc -c al_engine.c
 
 clean:
-	rm  $(OBJECTS)
+
+	-rm *.o
