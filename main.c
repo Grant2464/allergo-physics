@@ -10,19 +10,19 @@ vector pos;
 int x=300;
 int y=300;
 int main() {
-		new_engine = malloc(sizeof(engine));
-		engineInit(new_engine,1000,1000,0,0,0);
+		new_engine = createEngine();
+		engineInit(new_engine,600,600,0,0,0);
 
 		while(new_engine->exit_status) {
 				eventCheck(new_engine);
 
-				if(keyDown(ALLEGRO_KEY_ESCAPE) || (keyDown(217) && ((keyDown(23) || keyDown(17)) ))) {
+				if(keyDown(ALLEGRO_KEY_ESCAPE,new_engine) || (keyDown(217,new_engine) && ((keyDown(23,new_engine) || keyDown(17,new_engine)) ))) {
 						exitEngine(new_engine);
 				}
 
 				clearDisplay(0,0,0);
-				circle(100,100,10,255,255,255,10);
-				updateDisplay(60);
+				printf("out: %i\n",mouseButtonPressed(0,new_engine));
+				updatedisplay(60);
 		}
 
 		engineQuit(new_engine);
