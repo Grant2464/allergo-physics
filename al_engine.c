@@ -1,5 +1,6 @@
 #include "al_engine.h"
-bool empty[]={0,0,0};
+bool empty[3]={0,0,0};
+
 
 ////////////////////////////////NON-ENGINE RELATED////////////////////////////////
 void delay(int sec){
@@ -19,8 +20,11 @@ void engineInit(engine * new_engine, int w, int h,int r,int g,int b ) {
 		new_engine->exit_status=1;
 		new_engine->display=NULL,new_engine->event_queue=NULL;
 		new_engine->width=w,new_engine->height=h;
+		if(!al_init()) {
+				printf("al_init didn't work\n");
+				assert(1);
+		}
 
-		assert(al_init());
 		assert(al_init_primitives_addon());
 
 		new_engine->display=al_create_display(new_engine->width,new_engine->height);
@@ -47,6 +51,8 @@ void engineQuit(engine * to_exit){
 ////////////////////////////////EVENTS////////////////////////////////
 void eventCheck(engine * check_engine){
 		al_get_next_event( check_engine->event_queue, &check_engine->event);
+		printf("last: %i, now: %i\n",check_engine->mouse_buttons[0],check_engine->last_mouse_buttons[1]);
+
 		switch(check_engine->event.type) {
 		case ALLEGRO_EVENT_KEY_DOWN:
 				check_engine->keys[ check_engine->event.keyboard.keycode ] = 1;
@@ -59,15 +65,22 @@ void eventCheck(engine * check_engine){
 				al_get_mouse_state(&check_engine->mouse_state);
 				break;
 		case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-				memcpy(check_engine->last_mouse_buttons,check_engine->mouse_buttons,sizeof(check_engine->last_mouse_buttons));
+				// memcpy(check_engine->last_mouse_buttons,check_engine->mouse_buttons,sizeof(check_engine->last_mouse_buttons));
 				al_get_mouse_state(&check_engine->mouse_state);
 				check_engine->mouse_buttons[0]=check_engine->mouse_state.buttons & 1;
 				check_engine->mouse_buttons[1]=check_engine->mouse_state.buttons & 2;
 				check_engine->mouse_buttons[2]=check_engine->mouse_state.buttons & 4;
 				break;
 		case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
-				memcpy(check_engine->last_mouse_buttons,empty,sizeof(empty));
-				memcpy(check_engine->mouse_buttons,empty,sizeof(empty));
+
+				check_engine->mouse_buttons[0]=0;
+				check_engine->mouse_buttons[1]=0;
+				check_engine->mouse_buttons[2]=0;
+				check_engine->last_mouse_buttons[0]=0;
+				check_engine->last_mouse_buttons[1]=0;
+				check_engine->last_mouse_buttons[2]=0;
+				// memcpy(check_engine->last_mouse_buttons,empty,sizeof(empty));
+				// memcpy(check_engine->mouse_buttons,empty,sizeof(empty));
 				break;
 
 		case ALLEGRO_EVENT_DISPLAY_CLOSE:
@@ -104,7 +117,7 @@ bool mouseButtonUp(int button,engine * check_engine){
 		return !check_engine->mouse_buttons[button];
 }
 bool mouseButtonPressed(int button,engine * check_engine){
-		if(check_engine->mouse_buttons[button] && !check_engine->last_mouse_buttons[button]) {
+		if(!check_engine->last_mouse_buttons[button] && check_engine->mouse_buttons[button]) {
 				check_engine->last_mouse_buttons[button] = 1;
 				return 1;
 		}

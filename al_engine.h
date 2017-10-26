@@ -1,13 +1,14 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
 #include <stdio.h>
+
 #include <math.h>
 #include <assert.h>
 
 #define MOUSE_LEFT 0
 #define MOUSE_RIGHT 1
 #define MOUSE_MIDDLE 2
-#define createEngine() malloc(sizeof(engine))
+#define createEngine(the_engine) malloc(sizeof *the_engine)
 #define rgb(r, g, b) al_map_rgb( r,  g,  b)
 #define clearDisplay(r,g,b) al_clear_to_color(al_map_rgb(r,g,b))
 #define updatedisplay(sec)  al_flip_display(); delay(1000/sec)
