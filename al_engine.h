@@ -1,5 +1,9 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_ttf.h>
+
+#include <allegro5/allegro_font.h>
+
 #include <stdio.h>
 
 #include <math.h>
@@ -20,17 +24,19 @@ typedef struct _engine {
 		int width;
 		int height;
 		bool exit_status;
+		ALLEGRO_FONT *font;
 
 		ALLEGRO_DISPLAY *display;
 		ALLEGRO_EVENT_QUEUE *event_queue;
 		ALLEGRO_EVENT event;
-
+		bool focused;
 		bool keys[ ALLEGRO_KEY_MAX ];
 		bool last_keys[ ALLEGRO_KEY_MAX ];
 		ALLEGRO_MOUSE_STATE mouse_state;
-		bool mouse_buttons[2];
+		bool mouse_buttons[3];
 		bool last_mouse_buttons[3];
 		vector mouse_pos;
+		vector last_mouse_pos;
 } engine;
 typedef struct _MouseButtons {
 		bool left;
@@ -43,7 +49,7 @@ void delay (int sec);
 vector createVector(float x, float y);
 
 ////////////////////////////////ENGINE////////////////////////////////
-void engineInit(engine * setup,int w, int h,int r, int g, int b);
+void engineInit(engine * new_engine, const char *title,int w, int h,int r,int g,int b,int pt );
 void engineQuit(engine * to_exit);
 
 ////////////////////////////////EVENTS////////////////////////////////
@@ -54,15 +60,18 @@ void exitEngine(engine * check_engine);
 bool keyDown(int keycode,engine * new_engine);
 bool keyUp(int keycode,engine * new_engine );
 bool keyPressed(int keycode,engine * check_engine);
+bool keyReleased(int keycode,engine * check_engine);
 
-vector mousePos(engine * check_engine);
+
+bool mouseMoving(engine * check_engine);
 bool mouseButtonDown(int button,engine * check_engine);
 bool mouseButtonUp(int button,engine * check_engine);
 bool mouseButtonPressed(int button,engine * check_engine);
+bool mouseButtonReleased(int button,engine * check_engine);
 
 ///////////////////////////////DRAWING////////////////////////////////
 void circle(int x, int y, int r, int color_r,int color_g, int color_b,int stroke);
 void rectangle(int x1, int y1, int x2,int y2, int color_r,int color_g, int color_b,int stroke);
 void line(int x1, int y1, int x2,int y2, int color_r,int color_g, int color_b,int stroke);
-
 vector pixel2coord(engine * canvas,float x, float y);
+void text( int r, int g, int b, int x, int y, char *text, engine * canvas);
