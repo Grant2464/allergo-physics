@@ -37,7 +37,9 @@ typedef struct _engine {
 		bool last_mouse_buttons[3];
 		vector mouse_pos;
 		vector last_mouse_pos;
+		vector wheel_pos;
 } engine;
+
 typedef struct _MouseButtons {
 		bool left;
 		bool right;
@@ -63,7 +65,7 @@ bool keyPressed(int keycode,engine * check_engine);
 bool keyReleased(int keycode,engine * check_engine);
 
 
-bool mouseMoving(engine * check_engine);
+bool mouseCursorMoving(int axis,engine * check_engine);
 bool mouseButtonDown(int button,engine * check_engine);
 bool mouseButtonUp(int button,engine * check_engine);
 bool mouseButtonPressed(int button,engine * check_engine);

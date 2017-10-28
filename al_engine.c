@@ -58,7 +58,10 @@ void engineQuit(engine * to_exit){
 }
 
 ////////////////////////////////EVENTS////////////////////////////////
+
+
 void eventCheck(engine * check_engine){
+
 		al_get_next_event( check_engine->event_queue, &check_engine->event);
 
 		switch(check_engine->event.type) {
@@ -66,13 +69,15 @@ void eventCheck(engine * check_engine){
 				check_engine->keys[ check_engine->event.keyboard.keycode ] = 1;
 				break;
 		case ALLEGRO_EVENT_KEY_UP:
-				// check_engine->last_keys[check_engine->event.keyboard.keycode] = 0;
 				check_engine->keys[ check_engine->event.keyboard.keycode ] = 0;
 				break;
 		case ALLEGRO_EVENT_MOUSE_AXES:
 				check_engine->last_mouse_pos=createVector(check_engine->mouse_state.x,check_engine->mouse_state.y);
+
 				al_get_mouse_state(&check_engine->mouse_state);
 				check_engine->mouse_pos=createVector(check_engine->mouse_state.x,check_engine->mouse_state.y);
+				check_engine->wheel_pos=createVector(check_engine->mouse_state.w,check_engine->mouse_state.z);
+
 				break;
 		case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
 				for(int i=0; i< sizeof(check_engine->mouse_buttons)/sizeof(check_engine->mouse_buttons[0]); i++) {
@@ -136,8 +141,11 @@ bool keyReleased(int keycode,engine * check_engine){
 		return 0;
 }
 
-bool mouseMoving(engine * check_engine){
-		if((check_engine->mouse_pos.x != check_engine->last_mouse_pos.x) || (check_engine->mouse_pos.y != check_engine->last_mouse_pos.y)) {
+bool mouseCursorMoving(int axis, engine * check_engine){
+		bool x=check_engine->mouse_pos.x != check_engine->last_mouse_pos.x;
+		bool y=check_engine->mouse_pos.y != check_engine->last_mouse_pos.y;
+		bool states[3]={x || y,x,y};
+		if(states[axis]) {
 				return true;
 		}
 		return false;
@@ -163,6 +171,16 @@ bool mouseButtonReleased(int button,engine * check_engine){
 		}
 		return 0;
 }
+
+// bool mouseWheelMoving(int axis, engine * check_engine){
+//      bool w=check_engine->wheel_pos.x != check_engine->last_wheel_pos.x;
+//      bool z=check_engine->wheel_pos.y != check_engine->last_wheel_pos.y;
+//      bool states[3]={w || z,w,z};
+//      if(states[axis]) {
+//              return true;
+//      }
+//      return false;
+// }
 
 ///////////////////////////////DRAWING///////////////////////////////
 void circle(int x, int y, int r, int color_r,int color_g, int color_b,int stroke){
