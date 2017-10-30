@@ -3,7 +3,7 @@
 #include <allegro5/allegro_ttf.h>
 
 #include <allegro5/allegro_font.h>
-
+#include <allegro5/allegro_opengl.h>
 #include <stdio.h>
 
 #include <math.h>
@@ -12,17 +12,24 @@
 #define MOUSE_LEFT 0
 #define MOUSE_RIGHT 1
 #define MOUSE_MIDDLE 2
+#define FIXED 0
+#define RESIZEABLE 1
 #define createEngine(the_engine) malloc(sizeof *the_engine)
 #define rgb(r, g, b) al_map_rgb( r,  g,  b)
 #define clearDisplay(r,g,b) al_clear_to_color(al_map_rgb(r,g,b))
-#define updatedisplay(sec)  al_flip_display(); delay(1000/sec)
-typedef struct _vector {
+#define updatedisplay(sec)  al_flip_display()
+typedef struct _VectorF {
 		float x;
 		float y;
-} vector;
+} VectorF;
+typedef struct _VectorI {
+		int x;
+		int y;
+} VectorI;
 typedef struct _engine {
 		int width;
 		int height;
+		bool win_size;
 		bool exit_status;
 		ALLEGRO_FONT *font;
 
@@ -35,9 +42,9 @@ typedef struct _engine {
 		ALLEGRO_MOUSE_STATE mouse_state;
 		bool mouse_buttons[3];
 		bool last_mouse_buttons[3];
-		vector mouse_pos;
-		vector last_mouse_pos;
-		vector wheel_pos;
+		VectorI mouse_pos;
+		VectorI last_mouse_pos;
+		VectorI wheel_pos;
 } engine;
 
 typedef struct _MouseButtons {
@@ -48,10 +55,12 @@ typedef struct _MouseButtons {
 
 //////////////////////////NON-ENGINE RELATED//////////////////////////
 void delay (int sec);
-vector createVector(float x, float y);
+VectorI createVectorI(int x, int y);
+VectorF createVectorF(float x, float y);
+
 
 ////////////////////////////////ENGINE////////////////////////////////
-void engineInit(engine * new_engine, const char *title,int w, int h,int r,int g,int b,int pt );
+void engineInit(engine * new_engine, const char *title,int w, int h,bool resizeable,int r,int g,int b,int pt);
 void engineQuit(engine * to_exit);
 
 ////////////////////////////////EVENTS////////////////////////////////
@@ -65,15 +74,8 @@ bool keyPressed(int keycode,engine * check_engine);
 bool keyReleased(int keycode,engine * check_engine);
 
 
-bool mouseCursorMoving(int axis,engine * check_engine);
+bool mouseCursorMoving(engine * check_engine);
 bool mouseButtonDown(int button,engine * check_engine);
 bool mouseButtonUp(int button,engine * check_engine);
 bool mouseButtonPressed(int button,engine * check_engine);
 bool mouseButtonReleased(int button,engine * check_engine);
-
-///////////////////////////////DRAWING////////////////////////////////
-void circle(int x, int y, int r, int color_r,int color_g, int color_b,int stroke);
-void rectangle(int x1, int y1, int x2,int y2, int color_r,int color_g, int color_b,int stroke);
-void line(int x1, int y1, int x2,int y2, int color_r,int color_g, int color_b,int stroke);
-vector pixel2coord(engine * canvas,float x, float y);
-void text( int r, int g, int b, int x, int y, char *text, engine * canvas);

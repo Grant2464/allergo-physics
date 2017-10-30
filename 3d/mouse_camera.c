@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <allegro5/allegro_opengl.h>
 
-#include "al_engine.h"
+#include "core/al_engine.h"
 #define new_max(x,y) ((x) >= (y)) ? (x) : (y)
 engine *new_engine;
 vector pos;
@@ -14,7 +14,6 @@ void glSetup(int r, int g, int b, int extra){
 
 		glClearColor(r, g, b, extra);
 		// Clear a window
-
 		// Initializes coordinate system of projection
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -107,6 +106,7 @@ int main() {
 		float y_origin = 1;
 		float x_pos =0;
 		float y_pos =0;
+		printf("O Window! my Window! our fearful trip is done\nThe ship has weather’d every rack, the prize we sought is won\n" );
 		while(new_engine->exit_status) {
 
 				eventCheck(new_engine);
@@ -143,6 +143,8 @@ int main() {
 				// clearDisplay(0,0,0);
 
 		}
+		printf("Walk the deck my Captain lies\n Fallen cold and dead\n");
+
 
 		engineQuit(new_engine);
 		return 0;

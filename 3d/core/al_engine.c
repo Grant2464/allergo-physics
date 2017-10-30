@@ -9,15 +9,21 @@ void delay(int sec){
 		clock_t start = clock();
 		while (clock() < start + ms) ;
 }
-vector createVector(float x, float y){
-		vector out;
+VectorI createVectorI(int x, int y){
+		VectorI out;
+		out.x=x;
+		out.y=y;
+		return out;
+}
+VectorF createVectorF(float x, float y){
+		VectorF out;
 		out.x=x;
 		out.y=y;
 		return out;
 }
 
 ////////////////////////////////ENGINE////////////////////////////////
-void engineInit(engine * new_engine, const char *title,int w, int h,int r,int g,int b,int pt ) {
+void engineInit(engine * new_engine, const char *title,int w, int h,bool resizeable,int r,int g,int b,int pt ) {
 		new_engine->exit_status=1;
 		new_engine->focused=1;
 
@@ -30,10 +36,13 @@ void engineInit(engine * new_engine, const char *title,int w, int h,int r,int g,
 		assert(!new_engine->font);
 		assert(al_init_font_addon());
 		assert(al_init_ttf_addon());
-		new_engine->font = al_load_font("font.ttf", pt, 0);
+		new_engine->font = al_load_font("data/font.ttf", pt, 0);
 
 		assert(al_init_primitives_addon());
-		al_set_new_display_flags(ALLEGRO_RESIZABLE);
+		new_engine->win_size=resizeable;
+		if(resizeable) {
+				al_set_new_display_flags(ALLEGRO_RESIZABLE);
+		}
 
 		new_engine->display=al_create_display(new_engine->width,new_engine->height);
 		assert(new_engine->display);
@@ -56,6 +65,15 @@ void engineQuit(engine * to_exit){
 		al_destroy_event_queue(to_exit->event_queue);
 		al_destroy_display(to_exit->display);
 }
+void glSetup(int r, int g, int b, int extra){
+		// Window background color
+
+		glClearColor(r, g, b, extra);
+		// Clear a window
+		// Initializes coordinate system of projection
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+}
 
 ////////////////////////////////EVENTS////////////////////////////////
 
@@ -72,11 +90,11 @@ void eventCheck(engine * check_engine){
 				check_engine->keys[ check_engine->event.keyboard.keycode ] = 0;
 				break;
 		case ALLEGRO_EVENT_MOUSE_AXES:
-				check_engine->last_mouse_pos=createVector(check_engine->mouse_state.x,check_engine->mouse_state.y);
+				check_engine->last_mouse_pos=createVectorI(check_engine->mouse_state.x,check_engine->mouse_state.y);
 
 				al_get_mouse_state(&check_engine->mouse_state);
-				check_engine->mouse_pos=createVector(check_engine->mouse_state.x,check_engine->mouse_state.y);
-				check_engine->wheel_pos=createVector(check_engine->mouse_state.w,check_engine->mouse_state.z);
+				check_engine->mouse_pos=createVectorI(check_engine->mouse_state.x,check_engine->mouse_state.y);
+				check_engine->wheel_pos=createVectorI(check_engine->mouse_state.w,check_engine->mouse_state.z);
 
 				break;
 		case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
@@ -84,7 +102,7 @@ void eventCheck(engine * check_engine){
 						check_engine->last_mouse_buttons[i]=check_engine->mouse_buttons[i];
 				}
 				al_get_mouse_state(&check_engine->mouse_state);
-				check_engine->mouse_pos=createVector(check_engine->mouse_state.x,check_engine->mouse_state.y);
+				check_engine->mouse_pos=createVectorI(check_engine->mouse_state.x,check_engine->mouse_state.y);
 				check_engine->mouse_buttons[0]=check_engine->mouse_state.buttons & 1;
 				check_engine->mouse_buttons[1]=check_engine->mouse_state.buttons & 2;
 				check_engine->mouse_buttons[2]=check_engine->mouse_state.buttons & 4;
@@ -141,11 +159,9 @@ bool keyReleased(int keycode,engine * check_engine){
 		return 0;
 }
 
-bool mouseCursorMoving(int axis, engine * check_engine){
-		bool x=check_engine->mouse_pos.x != check_engine->last_mouse_pos.x;
-		bool y=check_engine->mouse_pos.y != check_engine->last_mouse_pos.y;
-		bool states[3]={x || y,x,y};
-		if(states[axis]) {
+bool mouseCursorMoving(engine * check_engine){
+
+		if((check_engine->mouse_pos.x != check_engine->last_mouse_pos.x) | (check_engine->mouse_pos.y != check_engine->last_mouse_pos.y)) {
 				return true;
 		}
 		return false;
@@ -170,32 +186,4 @@ bool mouseButtonReleased(int button,engine * check_engine){
 				return 1;
 		}
 		return 0;
-}
-
-// bool mouseWheelMoving(int axis, engine * check_engine){
-//      bool w=check_engine->wheel_pos.x != check_engine->last_wheel_pos.x;
-//      bool z=check_engine->wheel_pos.y != check_engine->last_wheel_pos.y;
-//      bool states[3]={w || z,w,z};
-//      if(states[axis]) {
-//              return true;
-//      }
-//      return false;
-// }
-
-///////////////////////////////DRAWING///////////////////////////////
-void circle(int x, int y, int r, int color_r,int color_g, int color_b,int stroke){
-		al_draw_circle(x, y, r, al_map_rgb(color_r,color_g,color_b), stroke);
-}
-void rectangle(int x1, int y1, int x2,int y2, int color_r,int color_g, int color_b,int stroke){
-		al_draw_rectangle(x1,y1,x2,y2, al_map_rgb(color_r,color_g,color_b), stroke);
-}
-void line(int x1, int y1, int x2,int y2, int color_r,int color_g, int color_b,int stroke){
-		al_draw_line(x1,y1,x2,y2, al_map_rgb(color_r,color_g,color_b), stroke);
-}
-
-vector pixel2coord(engine * canvas,float x, float y){
-		return createVector(x+canvas->height/2,-y+canvas->width/2);
-}
-void text(int r, int g, int b, int x, int y, char *text, engine * canvas){
-		al_draw_text(canvas->font, al_map_rgb(r, g, b), x, y, 0, text);
 }
